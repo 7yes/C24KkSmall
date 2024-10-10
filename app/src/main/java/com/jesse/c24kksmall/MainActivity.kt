@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.jesse.c24kksmall.data.model.DogResponse
+import com.jesse.c24kksmall.databinding.ActivityMainBinding
 import com.jesse.c24kksmall.presentation.MainVM
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -21,13 +22,17 @@ import retrofit2.http.Url
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity: AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+
     private val viewModel: MainVM by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -63,9 +68,9 @@ class MainActivity: AppCompatActivity() {
 
     interface DogsApib {
         @GET("random")
-        suspend fun getRandomDog():Response<DogResponse>
+        suspend fun getRandomDog(): Response<DogResponse>
 
         @GET
-        suspend fun getByBreed(@Url url:String):Response<DogResponse>
+        suspend fun getByBreed(@Url url: String): Response<DogResponse>
     }
 }

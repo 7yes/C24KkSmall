@@ -44,9 +44,9 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         Log.d("TAf", "onStart: ")
         //getDogs("african")
-        CoroutineScope(Dispatchers.IO).launch {
-            viewModel.getByBreed("african/images")
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//            viewModel.getByBreed("african/images")
+//        }
     }
 
     private fun getDogs(query: String) {

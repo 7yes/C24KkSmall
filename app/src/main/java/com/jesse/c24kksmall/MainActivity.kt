@@ -3,10 +3,13 @@ package com.jesse.c24kksmall
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.jesse.c24kksmall.data.model.DogResponse
+import com.jesse.c24kksmall.presentation.MainVM
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -15,8 +18,12 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Url
+import javax.inject.Inject
 
-class MainActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class MainActivity: AppCompatActivity() {
+    private val viewModel: MainVM by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -31,25 +38,22 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         Log.d("TAf", "onStart: ")
-        getDogs("african")
+        //getDogs("african")
+        CoroutineScope(Dispatchers.IO).launch {
+            viewModel.getByBreed("african/images")
+        }
     }
 
     private fun getDogs(query: String) {
+        val dogService = getRetrofitb().create(DogsApib::class.java)
         CoroutineScope(Dispatchers.IO).launch {
-            val call = getRetrofit().create(DogsApi::class.java).getByBreed("$query/images")
-            val body =call.body()
-            Log.d("TAf", "getByBreed: $body")
-        }
-
-        val dogService = getRetrofit().create(DogsApi::class.java)
-        CoroutineScope(Dispatchers.IO).launch {
-            val call = dogService.getByBreed("hound/images")
+            val call = dogService.getByBreed("$query/images")
             val myData = call.body()
-            Log.d("TAG", "getDogs: ${myData?.message}")
+            Log.d("TAf", "getDogs: ${myData?.message}")
         }
     }
 
-    fun getRetrofit(): Retrofit {
+    fun getRetrofitb(): Retrofit {
         return Retrofit.Builder()
             //           .baseUrl("https://dog.ceo/api/breeds/image/") // getRandomDog
             .baseUrl("https://dog.ceo/api/breed/") // getbyBreed
@@ -57,7 +61,7 @@ class MainActivity : AppCompatActivity() {
             .build()
     }
 
-    interface DogsApi {
+    interface DogsApib {
         @GET("random")
         suspend fun getRandomDog():Response<DogResponse>
 
